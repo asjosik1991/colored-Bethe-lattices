@@ -9,26 +9,7 @@ def bethe_dos(q,s):
         return (q+1)/(2*np.pi)*np.sqrt(4*q-s**2)/((q+1)**2-s**2)
     else:
         #print("check2", abs(s), 2*np.sqrt(q))
-
         return 0
-        
-def h_function(hops,h,s):
-    q=len(hops)-1
-    print(q)
-    main_term=0
-    for i in range(q+1):
-        main_term+=np.sqrt(h**2+4*hops[i]**2*s**2)
-        print(main_term)
-    return (main_term-2)/(q-1)   
-
-def colored_tree_func(hops,g,s):
-    q=len(hops)-1
-    print(q)
-    main_term=0
-    for i in range(q+1):
-        main_term+=np.sqrt(1+4*hops[i]**2*g**2)
-        print(main_term)
-    return (main_term-(q-1))/(2*s)
 
 def CT__derivative(hops,s):
     def func(g):
@@ -48,9 +29,29 @@ def CT_newton(hops,s):
         return main_term-(q-1)-2*s*g  
     return func
 
+
 def AT(x_n,x_n1,x_n2):
     return (x_n*x_n2-x_n1*x_n1)/(x_n+x_n2-2*x_n1)
+        
+def h_function(hops,h,s):
+    q=len(hops)-1
+    print(q)
+    main_term=0
+    for i in range(q+1):
+        main_term+=np.sqrt(h**2+4*hops[i]**2*s**2)
+        print(main_term)
+    return (main_term-2)/(q-1)   
 
+def colored_tree_func(hops,g,s):
+    q=len(hops)-1
+    print(q)
+    main_term=0
+    for i in range(q+1):
+        main_term+=np.sqrt(1+4*hops[i]**2*g**2)
+        print(main_term)
+    return (main_term-(q-1))/(2*s)
+
+#apply fixed point method and Aitken's delta-squared process
 def recursion(func, hops,s):
     #print("s",s)
     g_n=1j*0.5
