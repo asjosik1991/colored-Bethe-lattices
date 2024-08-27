@@ -5,10 +5,10 @@ from functools import partial
 
 def bethe_dos(q,s):
     if abs(s)<2*np.sqrt(q):
-        print("check", abs(s), 2*np.sqrt(q))
+        #print("check", abs(s), 2*np.sqrt(q))
         return (q+1)/(2*np.pi)*np.sqrt(4*q-s**2)/((q+1)**2-s**2)
     else:
-        print("check2", abs(s), 2*np.sqrt(q))
+        #print("check2", abs(s), 2*np.sqrt(q))
 
         return 0
         
@@ -78,7 +78,7 @@ def main():
     gs=np.zeros(len(ss))
     bs=np.zeros(len(ss))
     for i in range(len(ss)):
-        print(i)
+        print("step", i, "energy", ss[i])
         #gs[i]=np.imag(recursion(colored_tree_func, hops,ss[i]))
         #gs[i]=np.imag(recursion(h_function, hops,ss[i]))
         gs[i]=np.imag(newton(CT_newton(hops,ss[i]), 0.1, fprime=CT__derivative(hops,ss[i]), tol=10**(-4)))
