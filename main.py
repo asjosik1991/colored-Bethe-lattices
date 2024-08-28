@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 from scipy.optimize import newton
 from functools import partial
 
+
+"One-variable functional equations for Greens functions"
+
 def bethe_dos(q,s):
     if abs(s)<2*np.sqrt(q):
         #print("check", abs(s), 2*np.sqrt(q))
@@ -29,10 +32,27 @@ def CT_newton(hops,s):
         return main_term-(q-1)-2*s*g  
     return func
 
+def quadratic_function_bethe(q,s):
+    def func(g):
+        return (q+1)**2*(1+4*g**2)-((q-1)+2*s*g)**2
+    return func  
 
+def quartic_function_bethe(a,b,s):
+    def func(g):
+        return 64*(1+4*a**2*g**2)*(1+4*b**2*g**2)-( (2+2*s*g)**2 -4*((1+4*a**2*g**2)+(1+4*b**2*g**2)) )**2
+    return func  
+
+"TEST FUNCTIONS"
 def AT(x_n,x_n1,x_n2):
     return (x_n*x_n2-x_n1*x_n1)/(x_n+x_n2-2*x_n1)
-        
+   
+
+def test_vector_function(s):
+    def func(g):
+        return
+    return func
+
+     
 def h_function(hops,h,s):
     q=len(hops)-1
     print(q)
@@ -73,17 +93,23 @@ def recursion(func, hops,s):
     return g
 
 def main():
-    ss=np.arange(-4,4,0.1)-1j*10**(-1)
+    ss=np.arange(-6,6,0.1)-1j*10**(-1)
     #print(ss)
-    hops=[1,1,1]
+    hops=[1,1,2,1.1,1,1,1,1,1,1]
     gs=np.zeros(len(ss))
     bs=np.zeros(len(ss))
+    a=1
+    b=1
     for i in range(len(ss)):
         print("step", i, "energy", ss[i])
         #gs[i]=np.imag(recursion(colored_tree_func, hops,ss[i]))
         #gs[i]=np.imag(recursion(h_function, hops,ss[i]))
-        gs[i]=np.imag(newton(CT_newton(hops,ss[i]), 0.1, fprime=CT__derivative(hops,ss[i]), tol=10**(-4)))
-        bs[i]=bethe_dos(len(hops)-1,np.real(ss[i]))
+        #gs[i]=np.imag(newton(quadratic_function_bethe(2,ss[i]), 0.1, tol=10**(-4)))
+        gs[i]=np.imag(newton(quartic_function_bethe(a,b,ss[i]), 0.1+0.1*1j, tol=10**(-4)))
+
+        #gs[i]=np.imag(newton(CT_newton(hops,ss[i]), 0.1, fprime=CT__derivative(hops,ss[i]), tol=10**(-4),disp=False))
+        bs[i]=bethe_dos(3,np.real(ss[i]))
+        
     #print(gs)
     ss_real=np.real(ss)
     plt.plot(ss_real,gs/np.pi, label="numerical")
