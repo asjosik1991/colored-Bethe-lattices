@@ -114,17 +114,19 @@ def recursion(func, hops,s):
     return g
 
 def main():
-    ss=np.arange(-5,5,0.1)-1j*10**(-5)
+    ss=np.arange(-5,5,0.01)-1j*10**(-5)
     #print(ss)
     hops=np.array([1,2,1])
     N=len(hops)
-    gs=np.zeros(len(ss))
+    gs_im=np.zeros(len(ss))
+    gs_re=np.zeros(len(ss))
+
     bs=np.zeros(len(ss))
     a=1
     b=1
     g0=np.zeros(2*N)
     g0[:N]=0.1*np.ones(N)
-    g0[N:]=0.5*np.ones(N)
+    g0[N:]=0.6*np.ones(N)
 
     for i in range(len(ss)):
         print("step", i, "energy", ss[i])
@@ -142,11 +144,14 @@ def main():
         im_part=np.sum(sol[N:])
         print(re_part, im_part)
 
-        gs[i]=im_part/(np.pi*((np.real(ss[i])-re_part)**2+im_part**2))
+        gs_im[i]=im_part/(np.pi*((np.real(ss[i])-re_part)**2+im_part**2))
+        gs_re[i]=re_part/(np.pi*((np.real(ss[i])-re_part)**2+im_part**2))
         
     #print(gs)
     ss_real=np.real(ss)
-    plt.plot(ss_real,gs, label="numerical")
+    plt.plot(ss_real,gs_im, label="numerical imaginary part")
+    #plt.plot(ss_real,gs_re, label="numerical real part")
+
     #plt.plot(ss_real, bs, label="exact")
     plt.legend()
     plt.show()
