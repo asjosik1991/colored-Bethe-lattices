@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.optimize import newton
+from scipy.optimize import newton, root
 from functools import partial
 
 
@@ -45,11 +45,31 @@ def quartic_function_bethe(a,b,s):
 "TEST FUNCTIONS"
 def AT(x_n,x_n1,x_n2):
     return (x_n*x_n2-x_n1*x_n1)/(x_n+x_n2-2*x_n1)
-   
 
-def test_vector_function(s):
-    def func(g):
-        return
+def homotopy_from_bethe(a, n_steps):
+    a_hom=np.zeros((n_steps, len(a)))
+    for i in range(n_steps):
+        a_hom[i]=1+i*(a[i]-1)/n_steps
+    return a_hom
+
+def gs_vector_function(s, a):
+    def func(g0):
+        #print("g0", g0)
+        N=len(a)
+        g=g0[:N]+1j*g0[N:]
+        #print("g",g)
+        g_sum=np.sum(g)
+        f_array=np.zeros(N, dtype=complex)
+        for i in range(N):
+            f_array[i]=g[i]*(s-g_sum+g[i])-1
+            #print(f_array)
+        output=np.zeros(2*N)
+        output[:N]=np.real(f_array)
+        output[N:]=np.imag(f_array)
+
+        #print("result", output)
+        return output
+    
     return func
 
      
@@ -93,26 +113,37 @@ def recursion(func, hops,s):
     return g
 
 def main():
-    ss=np.arange(-6,6,0.1)-1j*10**(-1)
+    ss=np.arange(-6,6,0.1)-1j*10**(-5)
     #print(ss)
-    hops=[1,1,2,1.1,1,1,1,1,1,1]
+    hops=[1,1,1]
+    N=len(hops)
     gs=np.zeros(len(ss))
     bs=np.zeros(len(ss))
     a=1
     b=1
+    g0=[0,0,0,1,1,1]
+
     for i in range(len(ss)):
         print("step", i, "energy", ss[i])
+        #various approaches
         #gs[i]=np.imag(recursion(colored_tree_func, hops,ss[i]))
         #gs[i]=np.imag(recursion(h_function, hops,ss[i]))
         #gs[i]=np.imag(newton(quadratic_function_bethe(2,ss[i]), 0.1, tol=10**(-4)))
-        gs[i]=np.imag(newton(quartic_function_bethe(a,b,ss[i]), 0.1+0.1*1j, tol=10**(-4)))
-
+        #gs[i]=np.imag(newton(quartic_function_bethe(a,b,ss[i]), 0.1+0.1*1j, tol=10**(-4)))
         #gs[i]=np.imag(newton(CT_newton(hops,ss[i]), 0.1, fprime=CT__derivative(hops,ss[i]), tol=10**(-4),disp=False))
-        bs[i]=bethe_dos(3,np.real(ss[i]))
+        
+        #newton method for the system of equations
+        bs[i]=bethe_dos(2,np.real(ss[i]))
+        sol=root(gs_vector_function(ss[i], hops),g0, method="hybr").x
+        re_part=np.sum(sol[:N])
+        im_part=np.sum(sol[N:])
+        print(re_part, im_part)
+
+        gs[i]=im_part/(np.pi*((np.real(ss[i])-re_part)**2+im_part**2))
         
     #print(gs)
     ss_real=np.real(ss)
-    plt.plot(ss_real,gs/np.pi, label="numerical")
+    plt.plot(ss_real,gs, label="numerical")
     plt.plot(ss_real, bs, label="exact")
     plt.legend()
     plt.show()
