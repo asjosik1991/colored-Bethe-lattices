@@ -56,13 +56,13 @@ def gs_vector_function(s, a):
     def func(g0):
         #print("g0", g0)
         N=len(a)
-        a_sq=a*a
-        g=a_sq*(g0[:N]+a*1j*g0[N:])
+        #a_sq=a*a
+        g=(g0[:N]+1j*g0[N:])
         #print("g",g)
         g_sum=np.sum(g)
         f_array=np.zeros(N, dtype=complex)
         for i in range(N):
-            f_array[i]=g[i]*(s-g_sum+g[i])-1
+            f_array[i]=g[i]*(s-g_sum+g[i])-a[i]**2
             #print(f_array)
         output=np.zeros(2*N)
         output[:N]=np.real(f_array)
@@ -116,7 +116,7 @@ def recursion(func, hops,s):
 def main():
     ss=np.arange(-5,5,0.01)-1j*10**(-5)
     #print(ss)
-    hops=np.array([1,2,1])
+    hops=np.array([1.5,1,1])
     N=len(hops)
     gs_im=np.zeros(len(ss))
     gs_re=np.zeros(len(ss))
