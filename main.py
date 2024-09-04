@@ -56,7 +56,8 @@ def gs_vector_function(s, a):
     def func(g0):
         #print("g0", g0)
         N=len(a)
-        g=g0[:N]+1j*g0[N:]
+        a_sq=a*a
+        g=a_sq*(g0[:N]+a*1j*g0[N:])
         #print("g",g)
         g_sum=np.sum(g)
         f_array=np.zeros(N, dtype=complex)
@@ -113,15 +114,17 @@ def recursion(func, hops,s):
     return g
 
 def main():
-    ss=np.arange(-6,6,0.1)-1j*10**(-5)
+    ss=np.arange(-5,5,0.1)-1j*10**(-5)
     #print(ss)
-    hops=[1,1,1]
+    hops=np.array([1,2,1])
     N=len(hops)
     gs=np.zeros(len(ss))
     bs=np.zeros(len(ss))
     a=1
     b=1
-    g0=[0,0,0,1,1,1]
+    g0=np.zeros(2*N)
+    g0[:N]=0.1*np.ones(N)
+    g0[N:]=0.5*np.ones(N)
 
     for i in range(len(ss)):
         print("step", i, "energy", ss[i])
@@ -144,7 +147,7 @@ def main():
     #print(gs)
     ss_real=np.real(ss)
     plt.plot(ss_real,gs, label="numerical")
-    plt.plot(ss_real, bs, label="exact")
+    #plt.plot(ss_real, bs, label="exact")
     plt.legend()
     plt.show()
 
